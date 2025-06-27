@@ -1,0 +1,38 @@
+[
+  {
+    "site": "LINE占い",
+    "url": "https://fortune.line.me/horoscope/",
+    "scores": [
+      3.5,
+      3.0,
+      5.0,
+      4.5,
+      1.0,
+      1.5,
+      3.0,
+      2.0,
+      4.0,
+      2.5,
+      4.5,
+      3.5
+    ]
+  },
+  {
+    "site": "朝日新聞",
+    "url": "https://www.asahi.com/uranai/12seiza/",
+    "scores": [
+      4,
+      3,
+      4,
+      3,
+      1,
+      5,
+      3,
+      2,
+      3,
+      5,
+      1,
+      2
+    ]
+  }
+]
