@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>12星座占い比較</title>
+  <style>
+    body { font-family: sans-serif; padding: 1rem; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px 10px;
+      text-align: center;
+    }
+    th { background-color: #f0f0f0; }
+    .totals-row { font-weight: bold; background-color: #eef; }
+    .ranking { margin-top: 1.5rem; }
+    .ranking ol { padding-left: 1.5rem; }
+  </style>
+</head>
+<body>
+  <h1 id="dateText"></h1>
+
+  <table id="horoscopeTable">
+    <thead>
+      <tr>
+        <th>サイト</th>
+        <th>やぎ座</th>
+        <th>みずがめ座</th>
+        <th>うお座</th>
+        <th>おひつじ座</th>
+        <th>おうし座</th>
+        <th>ふたご座</th>
+        <th>かに座</th>
+        <th>しし座</th>
+        <th>おとめ座</th>
+        <th>てんびん座</th>
+        <th>さそり座</th>
+        <th>いて座</th>
+      </tr>
+    </thead>
+    <tbody id="dataRows">
+      <!-- 動的に挿入 -->
+    </tbody>
+    <tfoot>
+      <tr class="totals-row" id="totalsRow">
+        <td>合計点</td>
+        <!-- 動的に挿入 -->
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="ranking">
+    <h2>12星座ランキング</h2>
+    <ol id="rankingList">
+      <!-- 動的に挿入 -->
+    </ol>
+  </div>
+
+  <script>
+    // 日付の挿入
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    document.getElementById("dateText").textContent = `${y}年${m}月${d}日 12星座占いスコア比較`;
+
+    const zodiacOrder = [
+      "やぎ座", "みずがめ座", "うお座", "おひつじ座", "おうし座", "ふたご座",
+      "かに座", "しし座", "おとめ座", "てんびん座", "さそり座", "いて座"
+    ];
+
+    const dummyData = [
+      {
+        site: "LINE占い",
+        url: "https://fortune.line.me/horoscope/",
+        scores: [60, 80, 100, 40, 20, 60, 80, 100, 40, 20, 60, 80]
+      },
+      {
+        site: "マイナビ",
+        url: "https://news.mynavi.jp/article/20250627-3321142/",
+        scores: [80, 60, 40, 100, 20, 40, 60, 80, 100, 20, 60, 80]
+      },
+      {
+        site: "朝日新聞",
+        url: "https://www.asahi.com/uranai/12seiza/",
+        scores: [100, 100, 60, 80, 40, 40, 60, 60, 80, 20, 40, 60]
+      },
+      {
+        site: "本格占い",
+        url: "https://honkaku-uranai.jp/daily/horoscope/20250627/",
+        scores: [40, 60, 20, 100, 80, 60, 100, 40, 60, 20, 100, 80]
+      },
+      {
+        site: "VOGUE JAPAN",
+        url: "https://www.vogue.co.jp/horoscope/daily",
+        scores: [20, 40, 60, 80, 100, 40, 60, 80, 100, 40, 60, 80]
+      },
+      {
+        site: "ニフティー占い",
+        url: "https://uranai.nifty.com/f12seiza/",
+        scores: [100, 80, 60, 40, 20, 60, 80, 40, 20, 60, 80, 100]
+      }
+    ];
+
+    const tbody = document.getElementById("dataRows");
+    const totalsRow = document.getElementById("totalsRow");
+    const rankingList = document.getElementById("rankingList");
+
+    const totals = new Array(12).fill(0);
+
+    dummyData.forEach(entry => {
+      const row = document.createElement("tr");
+      const siteCell = document.createElement("td");
+      const link = document.createElement("a");
+      link.href = entry.url;
+      link.textContent = entry.site;
+      link.target = "_blank";
+      siteCell.appendChild(link);
+      row.appendChild(siteCell);
+
+      entry.scores.forEach((score, i) => {
+        totals[i] += score;
+        const td = document.createElement("td");
+        td.textContent = score;
+        row.appendChild(td);
+      });
+
+      tbody.appendChild(row);
+    });
+
+    totals.forEach(total => {
+      const td = document.createElement("td");
+      td.textContent = total;
+      totalsRow.appendChild(td);
+    });
+
+    // ランキング作成
+    const ranking = zodiacOrder.map((name, i) => ({
+      name,
+      score: totals[i]
+    })).sort((a, b) => b.score - a.score);
+
+    ranking.forEach(rank => {
+      const li = document.createElement("li");
+      li.textContent = `${rank.name}（${rank.score}点）`;
+      rankingList.appendChild(li);
+    });
+  </script>
+
+</body>
+</html>
