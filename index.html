@@ -57,11 +57,11 @@
   </div>
 
   <script>
-    // 日付の挿入
     const now = new Date();
     const y = now.getFullYear();
     const m = String(now.getMonth() + 1).padStart(2, '0');
     const d = String(now.getDate()).padStart(2, '0');
+    const dateStr = `${y}-${m}-${d}`;
     document.getElementById("dateText").textContent = `${y}年${m}月${d}日 12星座占いスコア比較`;
 
     const zodiacOrder = [
@@ -69,82 +69,57 @@
       "かに座", "しし座", "おとめ座", "てんびん座", "さそり座", "いて座"
     ];
 
-    const dummyData = [
-      {
-        site: "LINE占い",
-        url: "https://fortune.line.me/horoscope/",
-        scores: [60, 80, 100, 40, 20, 60, 80, 100, 40, 20, 60, 80]
-      },
-      {
-        site: "マイナビ",
-        url: "https://news.mynavi.jp/article/20250627-3321142/",
-        scores: [80, 60, 40, 100, 20, 40, 60, 80, 100, 20, 60, 80]
-      },
-      {
-        site: "朝日新聞",
-        url: "https://www.asahi.com/uranai/12seiza/",
-        scores: [100, 100, 60, 80, 40, 40, 60, 60, 80, 20, 40, 60]
-      },
-      {
-        site: "本格占い",
-        url: "https://honkaku-uranai.jp/daily/horoscope/20250627/",
-        scores: [40, 60, 20, 100, 80, 60, 100, 40, 60, 20, 100, 80]
-      },
-      {
-        site: "VOGUE JAPAN",
-        url: "https://www.vogue.co.jp/horoscope/daily",
-        scores: [20, 40, 60, 80, 100, 40, 60, 80, 100, 40, 60, 80]
-      },
-      {
-        site: "ニフティー占い",
-        url: "https://uranai.nifty.com/f12seiza/",
-        scores: [100, 80, 60, 40, 20, 60, 80, 40, 20, 60, 80, 100]
-      }
-    ];
-
     const tbody = document.getElementById("dataRows");
     const totalsRow = document.getElementById("totalsRow");
     const rankingList = document.getElementById("rankingList");
-
     const totals = new Array(12).fill(0);
 
-    dummyData.forEach(entry => {
-      const row = document.createElement("tr");
-      const siteCell = document.createElement("td");
-      const link = document.createElement("a");
-      link.href = entry.url;
-      link.textContent = entry.site;
-      link.target = "_blank";
-      siteCell.appendChild(link);
-      row.appendChild(siteCell);
+    fetch(`data/${dateStr}.json`)
+      .then(res => res.json())
+      .then(json => {
+        const data = json;
 
-      entry.scores.forEach((score, i) => {
-        totals[i] += score;
-        const td = document.createElement("td");
-        td.textContent = score;
-        row.appendChild(td);
+        data.forEach(entry => {
+          const row = document.createElement("tr");
+          const siteCell = document.createElement("td");
+          const link = document.createElement("a");
+          link.href = entry.url;
+          link.textContent = entry.site;
+          link.target = "_blank";
+          siteCell.appendChild(link);
+          row.appendChild(siteCell);
+
+          entry.scores.forEach((score, i) => {
+            const converted = Math.round(score * 20);  // ★5 → 100点に変換
+            totals[i] += converted;
+            const td = document.createElement("td");
+            td.textContent = converted;
+            row.appendChild(td);
+          });
+
+          tbody.appendChild(row);
+        });
+
+        totals.forEach(total => {
+          const td = document.createElement("td");
+          td.textContent = total;
+          totalsRow.appendChild(td);
+        });
+
+        const ranking = zodiacOrder.map((name, i) => ({
+          name,
+          score: totals[i]
+        })).sort((a, b) => b.score - a.score);
+
+        ranking.forEach(rank => {
+          const li = document.createElement("li");
+          li.textContent = `${rank.name}（${rank.score}点）`;
+          rankingList.appendChild(li);
+        });
+      })
+      .catch(err => {
+        console.error("JSONの読み込みに失敗しました", err);
       });
-
-      tbody.appendChild(row);
-    });
-
-    totals.forEach(total => {
-      const td = document.createElement("td");
-      td.textContent = total;
-      totalsRow.appendChild(td);
-    });
-
-    // ランキング作成
-    const ranking = zodiacOrder.map((name, i) => ({
-      name,
-      score: totals[i]
-    })).sort((a, b) => b.score - a.score);
-
-    ranking.forEach(rank => {
-      const li = document.createElement("li");
-      li.textContent = `${rank.name}（${rank.score}点）`;
-      rankingList.appendChild(li);
-    });
   </script>
 
 </body>
