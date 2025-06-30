@@ -1,0 +1,33 @@
+name: Scrape Horoscope
+
+on:
+  schedule:
+    - cron: '0 21 * * *'  # 毎日JST 6:00（=UTC 21:00）
+  workflow_dispatch:       # 手動実行も許可
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: GitHubリポジトリをクローン
+        uses: actions/checkout@v3
+
+      - name: Pythonセットアップ
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: 依存ライブラリをインストール
+        run: pip install -r requirements.txt
+
+      - name: スクレイピングスクリプトを実行
+        run: python scraper.py
+
+      - name: 変更をコミット＆プッシュ
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git commit -m "Auto-update horoscope JSON ($(date '+%Y-%m-%d'))" || echo "No changes"
+          git push
